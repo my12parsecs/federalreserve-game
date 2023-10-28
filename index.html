@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRB Game</title>
+    <link rel="stylesheet" href="style.css">
+
+
+    <script>
+        function copyUrl() {
+            const element = document.createElement('input');
+            element.value = location.href;
+            document.body.appendChild(element);
+            element.select();
+            document.execCommand('copy');
+            document.body.removeChild(element);
+            alert('リンクがコピーされました！');
+        }
+    </script>
+
+</head>
+
+
+<!-- 
+    ドメインはできればgovをいれたい
+ -->
+
+
+<body>
+    <div class="share">
+        <a href="" class="share-link" class="" target="_blank" rel="nofollow noopener noreferrer">
+            <button class="share-x"><img src="https://upload.wikimedia.org/wikipedia/commons/5/57/X_logo_2023_%28white%29.png" alt="" class="x-logo"></button>
+        </a>
+    </div>
+
+
+    <h1 class="title">Federal Reserve <span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Seal_of_the_United_States_Federal_Reserve_System.svg/1920px-Seal_of_the_United_States_Federal_Reserve_System.svg.png" alt="" class="fed-logo">
+    </span><span class="title-br"><br></span> The Game</h1>
+
+    <div class="main-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/US_one_dollar_bill%2C_obverse%2C_series_2009.jpg" alt="" class="bill-image">
+        <div class="start-button-container">
+            <button class="start-button">Start Printing</button>
+        </div>
+        <div class="interest-container">
+            <select name="interest-rate" id="" class="interest-option">
+                <option value="0">0%</option>
+                <option value="0.25">0.25%</option>
+                <option value="0.5">0.5%</option>
+                <option value="0.75">0.75%</option>
+                <option value="1">1%</option>
+            </select>
+            <input type="submit" value="Set Interest Rate" class="interest-submit">
+        </div>
+        <table class="current-container">
+            <tr class="current-each">
+                <th class="current-day">Day:　</th><td class="current-day-data">0</td>
+            </tr>
+            <tr class="current-each">
+                <th class="current-interest">Interest Rate:　</th><td class="current-interest-data">4.25%</td>
+            </tr>
+            <tr class="current-each">
+                <th class="current-inflation">Inflation:　</th><td>9.5%</td>
+            </tr>
+            <tr class="current-each">
+                <th class="current-unemploy">Unemployment Rate:　</th><td>10%</td>
+            </tr>
+        </table>
+    </div>
+    
+
+    <p class="hello"></p>
+
+
+
+    <script src="app.js"></script>
+</body>
+</html>

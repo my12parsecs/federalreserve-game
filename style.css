@@ -1,0 +1,127 @@
+body{
+    background-color: rgb(255, 255, 255);
+}
+
+.title{
+    text-align: center;
+    width: 100%;
+}
+.title-br{
+    display: none;
+}
+@media screen and (max-width: 450px) {
+    .title-br{
+        display: contents;
+    }
+  }
+.fed-logo{
+    width: 25px;
+}
+
+.main-container{
+    margin: auto;
+    width: 375px;
+    display: flex;
+    flex-direction: column;
+}
+.bill-image{
+    width: 300px;
+    margin: auto;
+    box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+.start-button-container{
+    display: flex;
+    margin-top: 30px;
+    justify-content: center;
+}
+.start-button{
+    margin: auto;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    background-color: green;
+    color: white;
+    font-weight: 600;
+    width: 110px;
+    height: 40px;
+}
+.start-message{
+    height: 40px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.interest-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+.interest-option{
+    margin-right: 10px;
+    cursor: pointer;
+    /* From https://css.glass */
+/* From https://css.glass */
+background: rgba(255, 255, 255, 0.57);
+border-radius: 7px;
+box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+backdrop-filter: blur(10.9px);
+-webkit-backdrop-filter: blur(10.9px);
+border: 1px solid rgba(255, 255, 255, 0.51);
+}
+.interest-submit{
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    background-color: rgb(108, 108, 108);
+    color: white;
+    font-weight: 600;
+    width: 130px;
+    height: 40px;
+}
+
+.current-container{
+    margin-top: 20px;
+    font-size: 20px;
+}
+.current-each{
+    height: 30px;
+}
+.current-each > th{
+    text-align: right;
+    width: 200px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+.share{
+    text-align: right;
+    align-items: center;
+    justify-content: right;
+  }
+.share-x{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 20px;
+    background-color: rgb(70, 70, 70);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer
+}
+.x-logo{
+    width: 15px;
+}
