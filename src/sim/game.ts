@@ -10,7 +10,7 @@ import { rollFns, rollShock } from "./shocks";
 import { postsFor, postsFromText } from "./social";
 import { holdings, newWallet, walletMark, walletOpen } from "./wallet";
 import { colorFor } from "./content/color";
-import type { ActionId, GameState, MeetingResult, QePace, SimEvent, Snapshot } from "./types";
+import type { ActionId, Alert, GameState, MeetingResult, QePace, SimEvent, Snapshot } from "./types";
 
 /** Calibrated once from the opening scenario (housing fair value anchor). */
 const HOUSING_K = housingConstant(initialEconomy());
@@ -237,9 +237,10 @@ export function newGame(seed = Date.now() >>> 0): GameState {
   return g;
 }
 
-/** Remove the front breaking-news popup (or all of them). */
-export function dismissAlert(prev: GameState, all = false): GameState {
-  return prev.alerts.length ? { ...prev, alerts: all ? [] : prev.alerts.slice(1) } : prev;
+/** Remove the breaking-news popups that match `remove`. */
+export function dismissAlerts(prev: GameState, remove: (a: Alert) => boolean): GameState {
+  const alerts = prev.alerts.filter((a) => !remove(a));
+  return alerts.length === prev.alerts.length ? prev : { ...prev, alerts };
 }
 
 /** Advance one trading hour during the inter-meeting cycle. */

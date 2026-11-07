@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { MAX_ARGUMENTS } from "../sim/arguments";
-import { advanceHour, dismissAlert, holdMeeting, newGame, setQePace, takeAction } from "../sim/game";
-import type { ActionId, GameState, QePace } from "../sim/types";
+import { advanceHour, dismissAlerts, holdMeeting, newGame, setQePace, takeAction } from "../sim/game";
+import type { ActionId, Alert, GameState, QePace } from "../sim/types";
 import { clearSave, loadSave } from "./persistence";
 
 /**
@@ -37,7 +37,10 @@ interface Store {
   setSpeed: (s: Speed) => void;
   togglePause: () => void;
   togglePauseOnNews: () => void;
-  dismissAlert: () => void;
+  /** Close one full-size popup */
+  dismissAlert: (id: number) => void;
+  /** Clear all corner toasts */
+  dismissToasts: () => void;
   restart: () => void;
   /** "Start over?" confirmation is open */
   confirmRestart: boolean;
@@ -92,13 +95,32 @@ function applyTheme(theme: Theme) {
   }
 }
 
+/** "Pause on news" is off unless the player turned it on. */
 function loadPref(): boolean {
   try {
-    return localStorage.getItem("frb.pauseOnNews") !== "false";
+    return localStorage.getItem("frb.pauseOnNews") === "true";
   } catch {
-    return true;
+    return false;
   }
 }
+
+/**
+ * Moments the player triggered (the opening briefing, FOMC decisions) always open
+ * full-size — they carry the goals and the vote roll call. "Pause on news" only
+ * governs true breaking news (world events, data surprises, market moves).
+ */
+export const alwaysModal = (a: Alert) => a.kind === "intro" || a.kind === "fomc";
+
+/** The full-size popup that should be open now (it also holds the clock). */
+export const modalAlert = (s: Pick<Store, "game" | "pauseOnNews">): Alert | undefined =>
+  s.game.status === "playing" ? s.game.alerts.find((a) => s.pauseOnNews || alwaysModal(a)) : undefined;
+
+/** The corner toast to show (only when no full-size popup is up). */
+export const toastAlert = (s: Pick<Store, "game" | "pauseOnNews">): Alert | undefined => {
+  if (s.pauseOnNews || s.game.status !== "playing" || modalAlert(s)) return undefined;
+  for (let i = s.game.alerts.length - 1; i >= 0; i--) if (!alwaysModal(s.game.alerts[i])) return s.game.alerts[i];
+  return undefined;
+};
 
 /** Whether the clock should be ticking right now. */
 export const isRunning = (
@@ -109,7 +131,7 @@ export const isRunning = (
   s.game.phase === "cycle" &&
   s.game.status === "playing" &&
   !s.paused &&
-  !(s.pauseOnNews && s.game.alerts.length > 0);
+  !modalAlert(s);
 
 export const useGame = create<Store>((set, get) => {
   /** Replace the game; when a meeting opens, reset the proposal form. */
@@ -169,8 +191,9 @@ export const useGame = create<Store>((set, get) => {
       }
       set({ pauseOnNews });
     },
-    // In toast mode only the newest alert is shown, so dismissing clears the backlog
-    dismissAlert: () => set({ game: dismissAlert(get().game, !get().pauseOnNews) }),
+    dismissAlert: (id) => set({ game: dismissAlerts(get().game, (a) => a.id === id) }),
+    // Only the newest toast is shown, so dismissing clears the backlog
+    dismissToasts: () => set({ game: dismissAlerts(get().game, (a) => !alwaysModal(a)) }),
     // Wipes the save too: the autosave then writes the new game right away
     restart: () => {
       clearSave();

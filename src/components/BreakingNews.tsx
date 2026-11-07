@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDay } from "../sim/calendar";
-import { useGame } from "../state/store";
+import { alwaysModal, modalAlert, toastAlert, useGame } from "../state/store";
 import { EventArt } from "./EventArt";
 
 const KICKER_CLASS: Record<string, string> = {
@@ -15,34 +15,42 @@ const KICKER_CLASS: Record<string, string> = {
 const EXIT_MS = 160;
 
 /**
- * Breaking-news popup for big moments. With "pause on news" on, it's a modal
- * that holds the clock; otherwise it slides in as a toast and auto-dismisses.
+ * Breaking-news popups. Full-size popups hold the clock: the opening briefing and
+ * FOMC decisions always, other news only with "pause on news" on. Otherwise news
+ * slides in as a corner toast and auto-dismisses.
  */
 export function BreakingNews() {
+  const modalItem = useGame(modalAlert);
+  const toastItem = useGame(toastAlert);
   const pauseOnNews = useGame((s) => s.pauseOnNews);
-  // Modal: work through the queue oldest-first. Toast: only the latest matters.
-  const alert = useGame((s) => (s.pauseOnNews ? s.game.alerts[0] : s.game.alerts[s.game.alerts.length - 1]));
-  const queued = useGame((s) => (s.pauseOnNews ? s.game.alerts.length - 1 : 0));
+  const queued = useGame((s) => (modalAlert(s) ? s.game.alerts.filter((a) => s.pauseOnNews || alwaysModal(a)).length - 1 : 0));
   const history = useGame((s) => s.game.history);
   const dismissAlert = useGame((s) => s.dismissAlert);
-  const over = useGame((s) => s.game.status === "over");
+  const dismissToasts = useGame((s) => s.dismissToasts);
   const [closing, setClosing] = useState(false);
   const closingRef = useRef(false);
 
-  const visible = !!alert && !over;
-  const modal = visible && pauseOnNews;
+  const alert = modalItem ?? toastItem;
+  const visible = !!alert;
+  const modal = !!modalItem;
+  // Remember which popup is closing, so the exit animation can't remove a different one
+  const current = useRef(alert);
+  current.current = alert;
 
-  /** Play the exit animation, then drop the alert. Ignores repeat presses. */
+  /** Play the exit animation, then drop the popup. Ignores repeat presses. */
   const dismiss = useCallback(() => {
-    if (closingRef.current) return;
+    if (closingRef.current || !current.current) return;
+    const target = current.current;
+    const isModal = !!modalItem;
     closingRef.current = true;
     setClosing(true);
     setTimeout(() => {
-      dismissAlert();
+      if (isModal) dismissAlert(target.id);
+      else dismissToasts();
       closingRef.current = false;
       setClosing(false);
     }, EXIT_MS);
-  }, [dismissAlert]);
+  }, [dismissAlert, dismissToasts, modalItem]);
 
   // While a modal is up, freeze background animations (ticker, pulses) so the
   // compositor only has the card to paint.
@@ -65,21 +73,21 @@ export function BreakingNews() {
     return () => window.removeEventListener("keydown", onKey);
   }, [modal, dismiss]);
 
-  // Toast mode: auto-dismiss
+  // Toasts auto-dismiss
   useEffect(() => {
-    if (!visible || pauseOnNews) return;
+    if (!visible || modal) return;
     const id = setTimeout(dismiss, 6000);
     return () => clearTimeout(id);
-  }, [alert?.id, visible, pauseOnNews, dismiss]);
+  }, [alert?.id, visible, modal, dismiss]);
 
   if (!visible || !alert) return null;
 
   const card = (
     <article
       key={alert.id}
-      className={`breaking ${pauseOnNews ? "modal-mode" : "toast-mode"} ${closing ? "closing" : ""}`}
+      className={`breaking ${modal ? "modal-mode" : "toast-mode"} ${closing ? "closing" : ""}`}
       role="dialog"
-      aria-modal={pauseOnNews}
+      aria-modal={modal}
       aria-label={alert.headline}
     >
       <EventArt art={alert.art} metric={alert.metric} history={history} />
@@ -102,7 +110,7 @@ export function BreakingNews() {
           </div>
         )}
 
-        {pauseOnNews && alert.rollCall && (
+        {modal && alert.rollCall && (
           <div className="rollcall">
             <div className="voices-head">How they voted</div>
             <ul>
@@ -117,7 +125,7 @@ export function BreakingNews() {
           </div>
         )}
 
-        {pauseOnNews && alert.voices.length > 0 && (
+        {modal && alert.voices.length > 0 && (
           <div className="voices">
             <div className="voices-head">What people are saying</div>
             {alert.voices.map((v) => (

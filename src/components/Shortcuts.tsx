@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ARGUMENTS } from "../sim/arguments";
-import { useGame } from "../state/store";
+import { modalAlert, useGame } from "../state/store";
 
 /**
  * All keyboard shortcuts in one place. Priority:
@@ -35,8 +35,8 @@ export function useShortcuts() {
         if ((e.key === " " || e.key === "Enter") && t.tagName === "BUTTON") t.blur();
       };
 
-      // A pausing news modal owns the keyboard (see BreakingNews)
-      if (s.pauseOnNews && g.alerts.length && g.status === "playing") return;
+      // A full-size news popup owns the keyboard (see BreakingNews)
+      if (modalAlert(s)) return;
 
       // The "start over?" dialog owns Enter / Esc while open
       if (s.confirmRestart) {
