@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Federal Reserve Game</title>
+  <!-- An original mark (not the Federal Reserve seal): a classical bank facade in amber on black -->
+  <rect width="64" height="64" rx="12" fill="#000"/>
+  <g fill="#ff9f1a">
+    <!-- pediment -->
+    <path d="M32 9 L55 22 H9 Z"/>
+    <!-- entablature -->
+    <rect x="11" y="24" width="42" height="4" rx="1"/>
+    <!-- four columns -->
+    <rect x="14" y="30" width="6" height="18" rx="1"/>
+    <rect x="24" y="30" width="6" height="18" rx="1"/>
+    <rect x="34" y="30" width="6" height="18" rx="1"/>
+    <rect x="44" y="30" width="6" height="18" rx="1"/>
+    <!-- steps -->
+    <rect x="10" y="50" width="44" height="3.5" rx="1"/>
+    <rect x="7" y="55" width="50" height="3.5" rx="1"/>
+  </g>
+  <!-- a rising-rate tick in the pediment -->
+  <path d="M22.5 19.6 L28 15.8 L32.5 18.2 L38.5 15.4" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
